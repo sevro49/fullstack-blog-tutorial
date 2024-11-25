@@ -35,14 +35,12 @@ const Register = () => {
         // Type assertion to safely extract the error
         const errorResponse = result.payload as RegisterErrorResponse | undefined;
   
-        console.log("error while navigating login", errorResponse?.error.error)
         // Extract error message or set a default error
         setErrorMsg(errorResponse?.error.error || "An unknown error occurred");
       }
     } else if (registerUser.rejected.match(result)) {
       // Type assertion to safely extract the error
       const errorResponse = result.payload as RegisterErrorResponse | undefined;
-      console.log("error while registering", errorResponse?.error.error)
       // Extract error message or set a default error
       setErrorMsg(errorResponse?.error.error || "An unknown error occurred");
     }
