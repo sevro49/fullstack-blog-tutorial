@@ -1,4 +1,4 @@
-import User from '@/types/types';
+import { User } from '@/types/types';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 
