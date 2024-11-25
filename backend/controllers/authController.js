@@ -6,7 +6,15 @@ const register = async (req, res) => {
   const { username, email, password } = req.body;
   try {
     const newUser = await User.create({ username, email, password });
-    res.status(201).json({ message: 'User registered successfully', user: newUser });
+
+    const userResponse = {
+      id: newUser._id,
+      email: newUser.email,
+      username: newUser.username,
+      role: newUser.role,
+    };
+
+    res.status(201).json({ message: 'User registered successfully', user: userResponse });
   } catch (error) {
     res.status(400).json({ error: 'Registration failed', details: error.message });
   }
@@ -39,7 +47,14 @@ const login = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
-    res.status(200).json({ message: 'Login successfull', user }); // success user login
+    const userResponse = {
+      id: user._id,
+      email: user.email,
+      username: user.username,
+      role: user.role,
+    }
+
+    res.status(200).json({ message: 'Login successfull', user: userResponse }); // success user login
   } catch (error) {
     res.status(500).json({ error: 'Login failed', details: error.message });
   }
