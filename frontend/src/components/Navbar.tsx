@@ -19,8 +19,8 @@ import {
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useSelector, useDispatch } from 'react-redux';
 import { Icon } from '@iconify/react';
-import { logout } from "@/features/authSlice";
-import { RootState } from "@/store/store";
+import { logoutUser } from "@/features/authSlice";
+import { AppDispatch, RootState } from "@/store/store";
 
 const dropdownLinks = [
   {id: 1, name: 'Add Blog', href: '#' },
@@ -28,12 +28,16 @@ const dropdownLinks = [
 ]
 
 const Navbar = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user); // Get user from the store
 
-  const handleLogout = () => {
-    dispatch(logout());
-  }
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutUser()); // Backend isteği gönder ve Redux'u güncelle
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
     <nav className="bg-stone-400 flex items-center justify-between px-4 sm:px-12 md:px-16 lg:px-28 xl:px-36 2xl:px-52 py-2 sm:py-4">

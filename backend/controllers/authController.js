@@ -82,10 +82,17 @@ const generateAccessToken = (req, res) => {
 };
 
 const logout = (req, res) => {
-  res.clearCookie('accessToken');
-  res.clearCookie('refreshToken');
+  const cookieOptions = {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/', // Cookie'nin oluşturulduğu path ile aynı olmalı
+  };
+
+  res.clearCookie('accessToken', cookieOptions);
+  res.clearCookie('refreshToken', cookieOptions);
 
   res.status(200).json({ message: 'Logged out successfully' });
-}
+};
 
 module.exports = { register, login, generateAccessToken, logout };
