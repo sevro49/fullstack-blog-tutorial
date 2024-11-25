@@ -4,6 +4,7 @@ import axios, { AxiosError } from 'axios';
 
 const LOGIN_URL = 'http://localhost:5000/api/auth/login';
 const REGISTER_URL = 'http://localhost:5000/api/auth/register';
+const LOGOUT_URL = 'http://localhost:5000/api/auth/logout';
 
 interface AuthState {
   user: User | null;
@@ -71,6 +72,26 @@ export const loginUser = createAsyncThunk<
   }
 );
 
+export const logoutUser = createAsyncThunk<
+  boolean, // Fulfilled payload türü
+  void, // Thunk argument türü
+  { rejectValue: { error: string } } // Rejected payload türü
+>(
+  'auth/logoutUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      await axios.post(LOGOUT_URL, {}, { withCredentials: true });
+
+      return true; // Fulfilled durumunda `boolean` döner
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue({ error: error.response?.data || 'An unknown error occurred' });
+      }
+      return rejectWithValue({ error: 'An unknown error occurred' });
+    }
+  }
+);
+
 
 const authSlice = createSlice({
   name: 'auth',
@@ -90,12 +111,16 @@ const authSlice = createSlice({
       state.status = 'failed';
       state.error = action.payload;
     },
-    logout: (state) => {
+    logoutSuccess: (state) => {
       state.user = null;
       state.accessToken = null;
       state.refreshToken = null;
       state.status = 'idle';
       state.error = null;
+    },
+    logoutFailure: (state, action: PayloadAction<string>) => {
+      state.status = 'failed';
+      state.error = action.payload;
     },
     registerSuccess: (
       state,
@@ -144,9 +169,22 @@ const authSlice = createSlice({
       .addCase(registerUser.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
+      })
+      
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        state.accessToken = null;
+        state.refreshToken = null;
+        state.status = 'idle';
+        state.error = null;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload?.error || 'Logout failed';
       });
   }
 })
-export const { loginSuccess, loginFailure, logout, registerSuccess, registerFailure } = authSlice.actions;
+export const { loginSuccess, loginFailure, logoutSuccess, logoutFailure
+  , registerSuccess, registerFailure } = authSlice.actions;
 
 export default authSlice.reducer;
